@@ -1,2 +1,2 @@
 
-void setupWlan();
+void setup_wlan();

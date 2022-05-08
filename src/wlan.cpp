@@ -2,7 +2,7 @@
 #include <settings.h>
 #include "logging.h"
 
-void setupWlan()
+void setup_wlan()
 {
     WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
 

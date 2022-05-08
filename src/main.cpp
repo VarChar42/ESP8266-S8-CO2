@@ -11,7 +11,9 @@ S8_UART *sensor_S8;
 S8_sensor sensor;
 
 
-int16_t getMetric();
+int16_t get_metric() {
+  return sensor_S8->get_co2();;
+}
 
 void setup() {
     Serial.begin(115200);
@@ -33,16 +35,13 @@ void setup() {
   Serial.println("Setup done!");
 
 
-  setupWlan();
-  setupHttpServer(&getMetric);
+  setup_wlan();
+  setup_http_server(&get_metric);
 
   Serial.flush();
 }
 
 void loop() {
-  handleHttpClient();
+  handle_http_client();
 }
 
-int16_t getMetric() {
-  return sensor_S8->get_co2();;
-}

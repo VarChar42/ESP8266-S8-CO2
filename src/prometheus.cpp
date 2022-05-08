@@ -14,11 +14,11 @@ void handle_http_not_found();
 void handle_http_metrics();
 void get_http_method_name(char *name, size_t name_length, HTTPMethod method);
 
-void handleHttpClient() {
+void handle_http_client() {
     http_server.handleClient();
 }
 
-void setupHttpServer(int16_t (*func)()) {
+void setup_http_server(int16_t (*func)()) {
     metricCallback = func;
     char message[128];
     log("Setting up HTTP server");
@@ -39,12 +39,18 @@ void handle_http_root() {
 
 void handle_http_metrics() {
     log_request();
+
+    float metric = metricCallback();
+
+    if(metric == 0) {
+        http_server.send(200, "text/plain; charset=utf-8", "# Could not get value");
+        return;
+    }
+
     static size_t const BUFSIZE = 512;
     static char const *response_template =
         "# TYPE " PROM_NAMESPACE "_co2_ppm gauge\n"
         PROM_NAMESPACE "_co2_ppm %f\n";
-
-    float metric = metricCallback();
 
     char response[BUFSIZE];    
     snprintf(response, BUFSIZE, response_template, metric);

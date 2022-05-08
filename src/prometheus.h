@@ -1,4 +1,4 @@
 #include <Arduino.h>
 
-void setupHttpServer(int16_t (*func)());
-void handleHttpClient();
+void setup_http_server(int16_t (*func)());
+void handle_http_client();
