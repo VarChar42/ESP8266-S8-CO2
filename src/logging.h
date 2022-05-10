@@ -1,8 +1,9 @@
 
-enum LogLevel {
+enum LogLevel
+{
     DEBUG,
     INFO,
     ERROR,
-}; 
+};
 
-void log(char const *message, LogLevel level=LogLevel::INFO);
+void log(char const *message, LogLevel level = LogLevel::INFO);

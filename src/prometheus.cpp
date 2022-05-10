@@ -1,9 +1,8 @@
 #include <ESP8266WebServer.h>
 #include "logging.h"
 
-#define HTTP_METRICS_ENDPOINT "/metrics" 
+#define HTTP_METRICS_ENDPOINT "/metrics"
 #define PROM_NAMESPACE "IOT_CO2"
-
 
 ESP8266WebServer http_server(8080);
 int16_t (*metricCallback)();
@@ -14,11 +13,13 @@ void handle_http_not_found();
 void handle_http_metrics();
 void get_http_method_name(char *name, size_t name_length, HTTPMethod method);
 
-void handle_http_client() {
+void handle_http_client()
+{
     http_server.handleClient();
 }
 
-void setup_http_server(int16_t (*func)()) {
+void setup_http_server(int16_t (*func)())
+{
     metricCallback = func;
     char message[128];
     log("Setting up HTTP server");
@@ -31,71 +32,47 @@ void setup_http_server(int16_t (*func)()) {
     log(message);
 }
 
-void handle_http_root() {
+void handle_http_root()
+{
     log_request();
     static char const *response = "Prometheus ESP8266 S8 CO2 sensor entpoint.";
     http_server.send(200, "text/plain; charset=utf-8", response);
 }
 
-void handle_http_metrics() {
-    log_request();
+void handle_http_metrics()
+{
+    log("begin metric request");
 
     float metric = metricCallback();
 
-    if(metric == 0) {
+    if (metric == 0)
+    {
         http_server.send(200, "text/plain; charset=utf-8", "# Could not get value");
         return;
     }
 
     static size_t const BUFSIZE = 512;
     static char const *response_template =
-        "# TYPE " PROM_NAMESPACE "_co2_ppm gauge\n"
-        PROM_NAMESPACE "_co2_ppm %f\n";
+        "# TYPE " PROM_NAMESPACE "_co2_ppm gauge\n" PROM_NAMESPACE "_co2_ppm %f\n";
 
-    char response[BUFSIZE];    
+    char response[BUFSIZE];
     snprintf(response, BUFSIZE, response_template, metric);
     http_server.send(200, "text/plain; charset=utf-8", response);
+
+    log("end metric request");
 }
 
-void handle_http_not_found() {
+void handle_http_not_found()
+{
     log_request();
     http_server.send(404, "text/plain; charset=utf-8", "Not found.");
 }
 
-void log_request() {
+void log_request()
+{
     char message[128];
-    char method_name[16];
-    get_http_method_name(method_name, 16, http_server.method());
-    snprintf(message, 128, "Request: client=%s:%u method=%s path=%s",
-            http_server.client().remoteIP().toString().c_str(), http_server.client().remotePort(), method_name, http_server.uri().c_str());
-    log(message, LogLevel::INFO);
-}
 
-void get_http_method_name(char *name, size_t name_length, HTTPMethod method) {
-    switch (method) {
-    case HTTP_GET:
-        snprintf(name, name_length, "GET");
-        break;
-    case HTTP_HEAD:
-        snprintf(name, name_length, "HEAD");
-        break;
-    case HTTP_POST:
-        snprintf(name, name_length, "POST");
-        break;
-    case HTTP_PUT:
-        snprintf(name, name_length, "PUT");
-        break;
-    case HTTP_PATCH:
-        snprintf(name, name_length, "PATCH");
-        break;
-    case HTTP_DELETE:
-        snprintf(name, name_length, "DELETE");
-        break;
-    case HTTP_OPTIONS:
-        snprintf(name, name_length, "OPTIONS");
-        break;
-    default:
-        snprintf(name, name_length, "UNKNOWN");
-        break;
-    }
+    snprintf(message, 128, "Request: client=%s:%u path=%s",
+             http_server.client().remoteIP().toString().c_str(), http_server.client().remotePort(), http_server.uri().c_str());
+    log(message, LogLevel::INFO);
 }

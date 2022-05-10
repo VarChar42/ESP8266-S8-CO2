@@ -14,9 +14,6 @@ void setup_wlan()
         Serial.print(".");
     }
 
-    WiFi.setAutoReconnect(true);
-    WiFi.persistent(true);
-
     char message[128];
 
     log("Wi-Fi connected.");
