@@ -12,9 +12,6 @@ S8_sensor sensor;
 int16_t get_metric()
 {
   int16_t metric = sensor_S8->get_co2();
-  Serial.print("Sensor reading: ");
-  Serial.println(metric);
-
   return metric;
 }
 
